@@ -89,6 +89,7 @@ impl eframe::App for App {
 
             for color in &self.palette {
                 ui.label(format!("{:?}", color));
+                ui.color_edit_button_srgb(&mut [color.r, color.g, color.b]);
             }
         });
     }
