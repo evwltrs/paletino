@@ -1,43 +1,74 @@
-use std::collections::HashMap;
+extern crate image;
+
+use image::GenericImageView;
+
+#[derive(Clone, Debug)]
+struct Color {
+    r: u8,
+    g: u8,
+    b: u8,
+}
+
+impl Color {
+    fn new(r: u8, g: u8, b: u8) -> Color {
+        Color { r, g, b }
+    }
+}
+
+fn median_cut(image: &image::DynamicImage, num_colors: usize) -> Vec<Color> {
+    let pixels = image
+        .pixels()
+        .map(|p| {
+            let rgba = p.2;
+            Color::new(rgba[0], rgba[1], rgba[2])
+        })
+        .collect::<Vec<Color>>();
+
+    let mut colors = vec![pixels];
+
+    while colors.len() < num_colors {
+        let len = colors.len();
+        for i in 0..len {
+            let mut color_group = colors.swap_remove(i);
+            color_group.sort_by(|a, b| {
+                let ar = a.r as u32;
+                let ag = a.g as u32;
+                let ab = a.b as u32;
+                let br = b.r as u32;
+                let bg = b.g as u32;
+                let bb = b.b as u32;
+                (ar * ar + ag * ag + ab * ab).cmp(&(br * br + bg * bg + bb * bb))
+            });
+            let split_index = color_group.len() / 2;
+            let (group1, group2) = color_group.split_at_mut(split_index);
+            colors.push(group1.to_vec());
+            colors.push(group2.to_vec());
+        }
+    }
+
+    let mut palette = Vec::new();
+    for color_group in colors.iter() {
+        let sum_r: u32 = color_group.iter().map(|c| c.r as u32).sum();
+        let sum_g: u32 = color_group.iter().map(|c| c.g as u32).sum();
+        let sum_b: u32 = color_group.iter().map(|c| c.b as u32).sum();
+        let num_colors = color_group.len() as u32;
+        let avg_color = Color::new(
+            (sum_r / num_colors) as u8,
+            (sum_g / num_colors) as u8,
+            (sum_b / num_colors) as u8,
+        );
+        palette.push(avg_color);
+    }
+
+    palette
+}
 
 fn main() {
-    // Open the image file
-    let img = image::open("image.png").expect("Failed to open image");
+    let image = image::open("sunset.jpg").unwrap();
+    let num_colors = 8; // Number of colors in the palette
 
-    // Resize the image to a smaller size for faster processing
-    let resized_img = img.resize(100, 100, image::imageops::FilterType::Lanczos3);
-
-    // Convert the image to the RGB color space
-    let rgb_img = resized_img.into_rgb8();
-
-    // Count the occurrences of each color
-    let color_counts = count_colors(&rgb_img);
-
-    // Sort the colors by their count in descending order
-    let sorted_colors = sort_colors(color_counts);
-
-    // Get the top 10 most common colors
-    let top_10_colors = sorted_colors.into_iter().take(10).collect::<Vec<_>>();
-
-    // Print the top 10 colors
-    for (color, count) in top_10_colors {
-        println!("Color: {:?}, Count: {}", color, count);
+    let palette = median_cut(&image, num_colors);
+    for color in palette {
+        println!("{}, {}, {}", color.r, color.g, color.b);
     }
-}
-
-fn count_colors(image: &image::RgbImage) -> HashMap<image::Rgb<u8>, u32> {
-    let mut color_counts: HashMap<image::Rgb<u8>, u32> = HashMap::new();
-
-    for (_, _, pixel) in image.enumerate_pixels() {
-        let count = color_counts.entry(*pixel).or_insert(0);
-        *count += 1;
-    }
-
-    color_counts
-}
-
-fn sort_colors(color_counts: HashMap<image::Rgb<u8>, u32>) -> Vec<(image::Rgb<u8>, u32)> {
-    let mut sorted_colors: Vec<(image::Rgb<u8>, u32)> = color_counts.into_iter().collect();
-    sorted_colors.sort_by(|a, b| b.1.cmp(&a.1)); // Sort by count in descending order
-    sorted_colors
 }
