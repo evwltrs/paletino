@@ -1,4 +1,4 @@
-use crate::widgets;
+use crate::{median_cut, widgets, Color};
 use egui_extras::RetainedImage;
 use std::io::Cursor;
 use widgets::file::FileDialog;
@@ -6,19 +6,19 @@ use widgets::file::FileDialog;
 pub struct App {
     img: Option<RetainedImage>,
     img_offset: egui::Pos2,
-    picked_path: Option<String>,
     available_height: f32,
     file: FileDialog,
+    palette: Vec<Color>,
 }
 
 impl Default for App {
     fn default() -> Self {
         Self {
             img: None,
-            picked_path: None,
             available_height: 0.0,
             img_offset: egui::pos2(0.0, 0.0),
             file: Default::default(),
+            palette: Default::default(),
         }
     }
 }
@@ -65,9 +65,7 @@ impl eframe::App for App {
                 // println!("Vec<u8>: {:#?}", file);
                 let mut buffer: Vec<u8> = Vec::new();
                 let mut writer = Cursor::new(&mut buffer);
-                let mut i =
-                    image::load_from_memory(&file).unwrap();
-
+                let mut i = image::load_from_memory(&file).unwrap();
 
                 i = i.resize(1000, 1000, image::imageops::FilterType::Triangle);
 
@@ -76,6 +74,8 @@ impl eframe::App for App {
                 self.img = None;
 
                 self.img = Some(RetainedImage::from_image_bytes("img", &buffer).unwrap());
+
+                self.palette = median_cut(&i, 6);
             }
 
             // Get available space for the image
@@ -86,6 +86,10 @@ impl eframe::App for App {
                 Some(i) => ui.image(i.texture_id(ctx), i.size_vec2()),
                 _ => ui.label(""),
             };
+
+            for color in &self.palette {
+                ui.label(format!("{:?}", color));
+            }
         });
     }
 }
