@@ -2,15 +2,18 @@ extern crate image;
 
 use image::GenericImageView;
 
+mod app;
+pub use app::App;
+
 #[derive(Clone, Debug)]
 pub struct Color {
-    r: u8,
-    g: u8,
-    b: u8,
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
 }
 
 impl Color {
-    fn new(r: u8, g: u8, b: u8) -> Color {
+    pub fn new(r: u8, g: u8, b: u8) -> Color {
         Color { r, g, b }
     }
 }
