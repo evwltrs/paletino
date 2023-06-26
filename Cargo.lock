@@ -1816,8 +1816,12 @@ dependencies = [
  "egui_extras",
  "env_logger",
  "image",
+ "js-sys",
  "log",
  "rfd",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
 ]
 
 [[package]]
