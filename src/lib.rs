@@ -5,6 +5,8 @@ use image::GenericImageView;
 mod app;
 pub use app::App;
 
+mod widgets;
+
 #[derive(Clone, Debug)]
 pub struct Color {
     pub r: u8,

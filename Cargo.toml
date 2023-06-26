@@ -12,3 +12,4 @@ egui_extras = { version = "0.22.0", features = ["image"] }
 env_logger = "0.10.0"
 image = "0.24.6"
 log = "0.4.19"
+rfd = "0.11.4"
