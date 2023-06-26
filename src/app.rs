@@ -66,7 +66,7 @@ impl eframe::App for App {
                 let mut buffer: Vec<u8> = Vec::new();
                 let mut writer = Cursor::new(&mut buffer);
                 let mut i =
-                    image::load_from_memory_with_format(&file, image::ImageFormat::Png).unwrap();
+                    image::load_from_memory(&file).unwrap();
 
 
                 i = i.resize(1000, 1000, image::imageops::FilterType::Triangle);
