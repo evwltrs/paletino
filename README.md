@@ -19,7 +19,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/evwltrs/paletino">
-    <img src="https://img.icons8.com/nolan/96/ghost.png" alt="Logo"/>
+    <img src="https://img.icons8.com/?size=128&id=Segceu5oDSqd&format=png" alt="Logo"/>
   </a>
 
 <h3 align="center">paletino</h3>
@@ -135,7 +135,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 ## Contact
 
-1nf - [@evancodes](https://twitter.com/evancodes) - ev@1nf.me
+1nf - [@evancodes](https://twitter.com/evancodes) - ev(at)1nf(dot)me
 
 Project Link: [https://github.com/evwltrs/paletino](https://github.com/evwltrs/paletino)
 
