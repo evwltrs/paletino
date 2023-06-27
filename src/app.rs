@@ -7,14 +7,16 @@ pub struct App {
     img: Option<RetainedImage>,
     file: FileDialog,
     palette: Vec<Color>,
+    color_count: usize,
 }
 
 impl Default for App {
     fn default() -> Self {
         Self {
-            img: None,
-            file: Default::default(),
-            palette: Default::default(),
+            img: (None),
+            file: (Default::default()),
+            palette: (Default::default()),
+            color_count: 6,
         }
     }
 }
@@ -52,10 +54,14 @@ impl eframe::App for App {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             // The central panel the region left after adding TopPanel's and SidePanel's
-
-            if ui.button("Open file…").clicked() {
-                self.file.open();
-            }
+            ui.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
+                if ui.button("Open file…").clicked() {
+                    self.file.open();
+                }
+                ui.label("Number of colors:");
+                let response = ui.add(egui::Slider::new(&mut self.color_count, 0..=20));
+                response.on_hover_text("Drag me!");
+            });
 
             if let Some(file) = self.file.get() {
                 // println!("Vec<u8>: {:#?}", file);
@@ -71,7 +77,7 @@ impl eframe::App for App {
 
                 self.img = Some(RetainedImage::from_image_bytes("img", &buffer).unwrap());
 
-                self.palette = median_cut(&i, 6);
+                self.palette = median_cut(&i, self.color_count);
             }
 
             match &self.img {
