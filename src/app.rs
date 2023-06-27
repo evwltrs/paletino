@@ -5,8 +5,6 @@ use widgets::file::FileDialog;
 
 pub struct App {
     img: Option<RetainedImage>,
-    img_offset: egui::Pos2,
-    available_height: f32,
     file: FileDialog,
     palette: Vec<Color>,
 }
@@ -15,8 +13,6 @@ impl Default for App {
     fn default() -> Self {
         Self {
             img: None,
-            available_height: 0.0,
-            img_offset: egui::pos2(0.0, 0.0),
             file: Default::default(),
             palette: Default::default(),
         }
@@ -67,7 +63,7 @@ impl eframe::App for App {
                 let mut writer = Cursor::new(&mut buffer);
                 let mut i = image::load_from_memory(&file).unwrap();
 
-                i = i.resize(1000, 1000, image::imageops::FilterType::Triangle);
+                i = i.resize(500, 500, image::imageops::FilterType::Triangle);
 
                 i.write_to(&mut writer, image::ImageFormat::Png).unwrap();
 
@@ -78,19 +74,17 @@ impl eframe::App for App {
                 self.palette = median_cut(&i, 6);
             }
 
-            // Get available space for the image
-            self.img_offset = ui.cursor().left_top();
-            self.available_height = ui.available_height();
-
             match &self.img {
                 Some(i) => ui.image(i.texture_id(ctx), i.size_vec2()),
                 _ => ui.label(""),
             };
 
-            for color in &self.palette {
-                ui.label(format!("{:?}", color));
-                ui.color_edit_button_srgb(&mut [color.r, color.g, color.b]);
-            }
+            ui.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
+                for color in &self.palette {
+                    //  ui.label(format!("{:?}", color));
+                    ui.color_edit_button_srgb(&mut [color.r, color.g, color.b]);
+                }
+            });
         });
     }
 }
