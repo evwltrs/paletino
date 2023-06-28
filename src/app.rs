@@ -22,27 +22,15 @@ impl Default for App {
 }
 
 impl App {
-    /// Called once before the first frame.
     pub fn new(_cc: &eframe::CreationContext<'_>) -> Self {
-        // This is also where you can customized the look at feel of egui using
-        // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
-
         Default::default()
     }
 }
 
 impl eframe::App for App {
-    /// Called each time the UI needs repainting, which may be many times per second.
-    /// Put your widgets into a `SidePanel`, `TopPanel`, `CentralPanel`, `Window` or `Area`.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        // Examples of how to create different panels and windows.
-        // Pick whichever suits you.
-        // Tip: a good default choice is to just keep the `CentralPanel`.
-        // For inspiration and more examples, go to https://emilk.github.io/egui
-
         #[cfg(not(target_arch = "wasm32"))] // no File->Quit on web pages!
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
-            // The top panel is often a good place for a menu bar:
             egui::menu::bar(ui, |ui| {
                 ui.menu_button("File", |ui| {
                     if ui.button("Quit").clicked() {
@@ -53,7 +41,6 @@ impl eframe::App for App {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            // The central panel the region left after adding TopPanel's and SidePanel's
             ui.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
                 if ui.button("Open file…").clicked() {
                     self.file.open();
@@ -64,7 +51,6 @@ impl eframe::App for App {
             });
 
             if let Some(file) = self.file.get() {
-                // println!("Vec<u8>: {:#?}", file);
                 let mut buffer: Vec<u8> = Vec::new();
                 let mut writer = Cursor::new(&mut buffer);
                 let mut i = image::load_from_memory(&file).unwrap();
@@ -87,7 +73,6 @@ impl eframe::App for App {
 
             ui.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
                 for color in &self.palette {
-                    //  ui.label(format!("{:?}", color));
                     ui.color_edit_button_srgb(&mut [color.r, color.g, color.b]);
                 }
             });
